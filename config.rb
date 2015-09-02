@@ -6,7 +6,7 @@ Encoding.default_external = "utf-8"
 # Set this to the root of your project when deployed:
 http_path = "/"
 css_dir = "src/css"
-sass_dir = "src/scss"
+sass_dir = "src/css"
 
 images_dir = "src/img"
 generated_images_dir = "src/img"

@@ -1,13 +1,26 @@
 # webpack-bootstrap
 
-基于 webpack + gulp 搭建纯静态页面型前端工程解决方案模板(在 [chemdemo/webpack-bootstrap](https://github.com/chemdemo/webpack-bootstrap) 修改而成，感谢原作者)。
+基于 webpack + gulp 搭建纯静态页面型前端工程解决方案模板
+
+*注:* 该模板由 [chemdemo/webpack-bootstrap](https://github.com/chemdemo/webpack-bootstrap) 修改而成，感谢原作者，详细信息请点击[基于webpack搭建前端工程解决方案探索](https://github.com/chemdemo/chemdemo.github.io/issues/10)查看
 
 
 ### 安装软件
 
 - iojs：v2.0+
+  
+  ``` bash
+  $ nvm ls
+  $ nvm install iojs-v3.2.0
+  ```
 
 - compass（非必须）：v1.0+
+  
+  ``` bash
+  $ sudo gem update --system
+  $ sudo gem install compass
+  $ compass --version
+  ```
 
 ### 拷贝项目模板
 
@@ -26,51 +39,65 @@ $ cd webpack-bootstrap && npm install
 
 ### 本地开发环境
 
-- 启动compass监听
+- 启动 compass 监听
 
-    ``` bash
-    $ compass watch
-    ```
-    compass在这里主要用于生成雪碧，雪碧图生成有多种方案，不一定要用compass。如果项目没用到雪碧图，完全可以不用compass，因为`sass-loader`可以直接加载sass文件
+  ``` bash
+  $ compass watch
+  ```
+  compass 在这里主要用于生成雪碧，雪碧图生成有多种方案，不一定要用 compass。如果项目没用到雪碧图，完全可以不用 compass，因为 `sass-loader` 可以直接加载 sass 文件
 
 - 启动本地开发服务器
 
-    ``` bash
-    $ npm run start
-    ```
-    浏览器打开`http://localhost:3005/a.html`即可访问。
+  ``` bash
+  $ npm run start
+  ```
+  浏览器打开 `http://localhost:3000/a.html` 即可访问
 
 ### 业务开发
 
 ##### 目录结构
 
 ``` js
-- root/
-  - src/                   # 开发目录
-    + css/                 # css资源
-    + img/                 # 图片资源
-    + js/                  # js&jsx资源
-    + scss/                # scss资源
-    + tmpl/                # 前端模板
-    a.html                 # 入口文件a
-    b.html                 # 入口文件b
-  + assets/                # 编译输出目录
-  + mock/                  # 假数据文件
-  app.js                   # 本地server入口
-  routes.js                # 本地路由配置
-  webpack.config.js        # webpack配置文件
-  webpack-dev.config.js    # 开发环境webpack配置文件
-  gulpfile.js              # gulp任务配置
-  config.rb                # compass配置
-  package.json             # 项目配置
-  README.md                # 项目说明
+- webapp/               # webapp根目录
+  - src/                # 开发目录
+    + css/              # css资源目录
+    + img/              # webapp图片资源目录
+    - js/               # webapp js&jsx资源目录
+      - component/      # 标准组件存放目录
+        - foo/          # 组件foo
+          + css/        # 组件foo的样式
+          + js/         # 组件foo的逻辑
+          + tmpl/       # 组件foo的模板
+          index.js      # 组件foo的入口
+        + bar/          # 组件bar
+      + lib/            # 第三方纯js库
+      ...               # 根据项目需要任意添加的代码目录
+    + tmpl/             # webapp前端模板资源目录
+    a.html              # webapp入口文件a
+    b.html              # webapp入口文件b
+  - asset/              # 编译输出目录，即发布目录
+    + css/              # 编译输出的css目录
+    + font/             # 编译输出的font目录
+    + img/              # 编译输出的图片目录
+    + js/               # 编译输出的js目录
+    a.html              # 编译输出的入口a
+    b.html              # 编译处理后的入口b
+  + mock/               # 假数据目录
+  + node_modules/       # CommonJS模块(通过 npm 安装，使用 import 方式引用)
+  app.js                # 本地server入口
+  routes.js             # 本地路由配置
+  webpack.config.js     # webpack配置文件
+  gulpfile.js           # gulp任务配置
+  config.rb             # compass配置
+  package.json          # 项目配置
+  README.md             # 项目说明
 ```
 
 ##### 单/多页面支持
 
-约定`/src/*.html`为应用的入口文件，在`/src/js/`一级目录下有一个同名的js文件作为该入口文件的逻辑入口（即entry）。
+约定 `/src/*.html` 为应用的入口文件，在 `/src/js/` 一级目录下有一个同名的 js 文件作为该入口文件的逻辑入口（即 entry）。
 
-在编译时会扫描入口html文件并且根据webpack配置项解决entry的路径依赖，同时还会对html文件进行压缩、字符替换等处理。
+在编译时会扫描入口 html 文件并且根据 webpack 配置项解决 entry 的路径依赖，同时还会对 html 文件进行压缩、字符替换等处理。
 
 这样可以做到同时支持SPA和多页面型的项目。
 
@@ -83,12 +110,12 @@ $ npm run build
 ### 模拟生产环境
 
 ``` bash
-$ npm run assets
+$ npm run asset
 ```
 
 ### 部署&发布
 
-纯静态页面型的应用，最简单的做法是直接把`assets`文件夹部署到指定机器即可（先配置好机器ip、密码、上传路径等信息）：
+纯静态页面型的应用，最简单的做法是直接把`asset`文件夹部署到指定机器即可（先配置好机器ip、密码、上传路径等信息）：
 
 ``` js
 $ npm run deploy # or run `gulp deploy`
@@ -107,4 +134,4 @@ output: {
 
 ### License
 
-MIT.
+MIT

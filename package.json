@@ -4,9 +4,9 @@
   "version": "0.0.1",
   "main": "app.js",
   "scripts": {
-    "start": "node-dev app",
+    "start": "node-dev --harmony app",
     "build": "gulp",
-    "assets": "NODE_ENV=prduction node app",
+    "asset": "NODE_ENV=prduction node --harmony app",
     "deploy": "gulp deploy"
   },
   "dependencies": {
@@ -37,7 +37,7 @@
     "koa-router": "^5.1.2",
     "koa-static": "^1.4.9",
     "koa-webpack-dev-middleware": "^1.0.1",
-    "lodash": "^3.10.0",
+    "lodash": "^3.10.1",
     "node-libs-browser": "^0.5.2",
     "sass-loader": "^1.0.3",
     "style-loader": "^0.12.3",

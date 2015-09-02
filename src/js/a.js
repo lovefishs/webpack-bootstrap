@@ -1,63 +1,82 @@
-/*
-* @Author: dmyang
-* @Date:   2015-08-05 00:25:43
-* @Last Modified by:   dmyang
-* @Last Modified time: 2015-08-18 21:14:59
-*/
-
 'use strict';
 
 console.info('require module a.');
 
 require('commonCss');
-require('../css/a.css');
+require('../css/a');
 
 require('zepto');
+require('fetch');
 
 // 直接使用npm模块
 var _ = require('lodash');
 
-var url = require('./utils/url');
-var report = require('./helpers/report');
+var component = getQuery('component');
 
-var component = url.getQuery('component');
+function getQuery(name) {
+  var u = location.search.slice(1);
+  var re = new RegExp(name + '=([^&\\s+]+)');
+  var m = u.match(re);
+  var v = m ? m[1] : '';
 
-if('dialog' === component) {
-    require.ensure([], function(require) {
-        var dialog = require('./components/dialog');
-        // todo ...
-
-        $('#dialog').removeClass('none');
-    });
+  return (v === '' || isNaN(v)) ? v : v - 0;
 }
 
-if('toast' === component) {
-    require.ensure([], function(require) {
-        var toast = require('./components/toast');
-        // todo ...
+if ('dialog' === component) {
+  require.ensure([], function(require) {
+    var dialog = require('./component/dialog');
+    // todo ...
 
-        $('#toast').removeClass('none');
-    });
+    $('#dialog').removeClass('none');
+  });
+}
+
+if ('toast' === component) {
+  require.ensure([], function(require) {
+    var toast = require('./component/toast');
+    // todo ...
+
+    $('#toast').removeClass('none');
+  });
 }
 
 require.ensure([], function() {
-    var ajax = require('./helpers/ajax');
-    var t = _.now();
+  var t = _.now();
+  var data = new FormData();
+  data.append('offset', 0);
+  data.append('limit', 5);
 
-    ajax.request({
-        url: '/api/list',
-        data: {
-            offset: 0,
-            limit: 5
-        }
-    }).done(function(data) {
-        var template = require('../tmpl/list.tpl');
-        var html = template({list: data || []});
+  // fetch('/api/list', {
+  //   method: 'post',
+  //   headers: {
+  //     'Accept': 'application/json',
+  //     'Content-Type': 'application/json'
+  //   },
+  //   body: JSON.stringify({
+  //     offset: 0,
+  //     limit: 5
+  //   })
+  // }).then(function(response) {
+  //   console.log(response);
+  // });
 
-        console.info('ajax took %d ms.', _.now() - t);
-
-        $('#list').html(html);
+  fetch('/api/list?offset=0&limit=5', {
+    method: 'get'
+  }).then(function(response) {
+    return response.json();
+  }).then(function(json) {
+    var template = require('../tmpl/list.ejs');
+    // console.log(template);
+    // console.log(typeof json, json);
+    
+    var html = template({
+      list: json.data || []
     });
+
+    console.info('ajax took %d ms.', _.now() - t);
+
+    $('#list').html(html);
+  });
 });
 
 var logoImg = require('webpackLogo');
