@@ -25,12 +25,13 @@ gulp.task('hint', function() {
 });
 
 // clean asset
-gulp.task('clean', ['hint'], function() {
-  var clean = require('gulp-clean');
-
-  return gulp.src(asset, {
-    read: true
-  }).pipe(clean());
+gulp.task('clean', function() {
+  // var ignore = require('gulp-ignore');
+  var rimraf = require('gulp-rimraf');
+  
+  return gulp.src('./**/*.js', { read: false }) // much faster
+    // .pipe(ignore('node_modules/**'))
+    .pipe(rimraf());
 });
 
 // run webpack pack
