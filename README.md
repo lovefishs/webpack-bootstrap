@@ -7,19 +7,15 @@
 
 ### 安装软件
 
-- iojs：v2.0+
+- NodeJS
   
   ``` bash
   $ nvm ls
-  $ nvm install iojs-v3.2.0
-  ```
-
-- compass（非必须）：v1.0+
-  
-  ``` bash
-  $ sudo gem update --system
-  $ sudo gem install compass
-  $ compass --version
+  $ nvm ls-remote
+  # 这里使用 4.1.1 做示范,建议使用最新版
+  $ nvm install v4.1.1
+  $ nvm use 4.1.1
+  $ nvm alias default 4.1.1
   ```
 
 ### 拷贝项目模板
@@ -27,7 +23,6 @@
 ``` bash
 $ clone https://github.com/lovefishs/webpack-bootstrap.git
 ```
-
 
 ### 安装依赖模块
 
@@ -38,13 +33,6 @@ $ cd webpack-bootstrap && npm install
 ```
 
 ### 本地开发环境
-
-- 启动 compass 监听
-
-  ``` bash
-  $ compass watch
-  ```
-  compass 在这里主要用于生成雪碧，雪碧图生成有多种方案，不一定要用 compass。如果项目没用到雪碧图，完全可以不用 compass，因为 `sass-loader` 可以直接加载 sass 文件
 
 - 启动本地开发服务器
 

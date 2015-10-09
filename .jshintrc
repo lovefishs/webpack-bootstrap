@@ -11,7 +11,7 @@
   "sub": true,
   "supernew": false,
   "freeze": true,
-  "indent": 4,
+  "indent": 2,
   "white": true,
   "curly": false,
   "camelcase": true,
