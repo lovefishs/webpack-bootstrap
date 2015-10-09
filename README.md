@@ -2,21 +2,19 @@
 
 基于 webpack + gulp 搭建纯静态页面型前端工程解决方案模板
 
-*注:* 该模板由 [chemdemo/webpack-bootstrap](https://github.com/chemdemo/webpack-bootstrap) 修改而成，感谢原作者，详细信息请点击[基于webpack搭建前端工程解决方案探索](https://github.com/chemdemo/chemdemo.github.io/issues/10)查看
-
+*注:* 该模板由 [chemdemo/webpack-bootstrap](https://github.com/chemdemo/webpack-bootstrap) 修改而成,感谢原作者,详细信息请点击[基于webpack搭建前端工程解决方案探索](https://github.com/chemdemo/chemdemo.github.io/issues/10)查看
 
 ### 安装软件
-
-- NodeJS
   
-  ``` bash
-  $ nvm ls
-  $ nvm ls-remote
-  # 这里使用 4.1.1 做示范,建议使用最新版
-  $ nvm install v4.1.1
-  $ nvm use 4.1.1
-  $ nvm alias default 4.1.1
-  ```
+``` bash
+# NodeJS
+$ nvm ls
+$ nvm ls-remote
+# 这里使用 4.1.1 做示范,建议使用最新版
+$ nvm install v4.1.1
+$ nvm use 4.1.1
+$ nvm alias default 4.1.1
+```
 
 ### 拷贝项目模板
 
@@ -28,18 +26,18 @@ $ clone https://github.com/lovefishs/webpack-bootstrap.git
 
 ``` bash
 $ npm install -g gulp webpack
-$ npm install -g node-dev # 推荐这个工具，代码改动会自动重启node进程
+$ npm install -g node-dev # 推荐这个工具.代码改动会自动重启 node 进程
 $ cd webpack-bootstrap && npm install
 ```
 
 ### 本地开发环境
 
-- 启动本地开发服务器
+``` bash
+# 启动本地开发服务器
+$ npm run start
+```
 
-  ``` bash
-  $ npm run start
-  ```
-  浏览器打开 `http://localhost:3000/a.html` 即可访问
+浏览器打开 `http://localhost:3000/a.html` 即可访问
 
 ### 业务开发
 
@@ -63,7 +61,7 @@ $ cd webpack-bootstrap && npm install
     + tmpl/             # webapp前端模板资源目录
     a.html              # webapp入口文件a
     b.html              # webapp入口文件b
-  - asset/              # 编译输出目录，即发布目录
+  - asset/              # 编译输出目录,即发布目录
     + css/              # 编译输出的css目录
     + font/             # 编译输出的font目录
     + img/              # 编译输出的图片目录
@@ -71,7 +69,7 @@ $ cd webpack-bootstrap && npm install
     a.html              # 编译输出的入口a
     b.html              # 编译处理后的入口b
   + mock/               # 假数据目录
-  + node_modules/       # CommonJS模块(通过 npm 安装，使用 import 方式引用)
+  + node_modules/       # CommonJS模块(通过 npm 安装,使用 import 方式引用)
   app.js                # 本地server入口
   routes.js             # 本地路由配置
   webpack.config.js     # webpack配置文件
@@ -83,11 +81,11 @@ $ cd webpack-bootstrap && npm install
 
 ##### 单/多页面支持
 
-约定 `/src/*.html` 为应用的入口文件，在 `/src/js/` 一级目录下有一个同名的 js 文件作为该入口文件的逻辑入口（即 entry）。
+约定 `/src/*.html` 为应用的入口文件,在 `/src/js/` 一级目录下有一个同名的 js 文件作为该入口文件的逻辑入口(entry).
 
-在编译时会扫描入口 html 文件并且根据 webpack 配置项解决 entry 的路径依赖，同时还会对 html 文件进行压缩、字符替换等处理。
+在编译时会扫描入口 html 文件并且根据 webpack 配置项解决 entry 的路径依赖,同时还会对 html 文件进行压缩、字符替换等处理.
 
-这样可以做到同时支持SPA和多页面型的项目。
+这样可以做到同时支持 SPA 和多页面型的项目.
 
 ### 编译
 
@@ -103,13 +101,13 @@ $ npm run asset
 
 ### 部署&发布
 
-纯静态页面型的应用，最简单的做法是直接把`asset`文件夹部署到指定机器即可（先配置好机器ip、密码、上传路径等信息）：
+纯静态页面型的应用,最简单的做法是直接把 `asset` 文件夹部署到指定机器即可(先配置好机器ip、密码、上传路径等信息):
 
 ``` js
 $ npm run deploy # or run `gulp deploy`
 ```
 
-如果需要将生成的js、css、图片等发布到cdn，修改下`publicPath`项为目标cdn地址即可：
+如果需要将生成的js、css、图片等发布到 cdn,修改下 `publicPath` 项为目标 cdn 地址即可:
 
 ``` js
 ...
