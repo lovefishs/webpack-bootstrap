@@ -1,0 +1,14 @@
+<thead>
+  <tr>
+    <th>title</th>
+    <th>content</th>
+  </tr>
+</thead>
+<tbody>
+  <% list.forEach(function(item) { %>
+    <tr>
+      <td><%= item.title %></td>
+      <td><%= item.content %></td>
+    </tr>
+  <% }); %>
+</tbody>

@@ -6,7 +6,7 @@
 
 ### 安装软件
   
-``` bash
+```bash
 # NodeJS
 $ nvm ls
 $ nvm ls-remote
@@ -18,22 +18,20 @@ $ nvm alias default 4.1.1
 
 ### 拷贝项目模板
 
-``` bash
+```bash
 $ clone https://github.com/lovefishs/webpack-bootstrap.git
 ```
 
 ### 安装依赖模块
 
-``` bash
-$ npm install -g gulp webpack
+```bash
 $ npm install -g node-dev # 推荐这个工具.代码改动会自动重启 node 进程
 $ cd webpack-bootstrap && npm install
 ```
 
 ### 本地开发环境
 
-``` bash
-# 启动本地开发服务器
+```bash
 $ npm run start
 ```
 
@@ -43,40 +41,42 @@ $ npm run start
 
 ##### 目录结构
 
-``` js
-- webapp/               # webapp根目录
-  - src/                # 开发目录
-    + css/              # css资源目录
-    + img/              # webapp图片资源目录
-    - js/               # webapp js&jsx资源目录
-      - component/      # 标准组件存放目录
-        - foo/          # 组件foo
-          + css/        # 组件foo的样式
-          + js/         # 组件foo的逻辑
-          + tmpl/       # 组件foo的模板
-          index.js      # 组件foo的入口
-        + bar/          # 组件bar
-      + lib/            # 第三方纯js库
-      ...               # 根据项目需要任意添加的代码目录
-    + tmpl/             # webapp前端模板资源目录
-    a.html              # webapp入口文件a
-    b.html              # webapp入口文件b
-  - asset/              # 编译输出目录,即发布目录
-    + css/              # 编译输出的css目录
-    + font/             # 编译输出的font目录
-    + img/              # 编译输出的图片目录
-    + js/               # 编译输出的js目录
-    a.html              # 编译输出的入口a
-    b.html              # 编译处理后的入口b
-  + mock/               # 假数据目录
-  + node_modules/       # CommonJS模块(通过 npm 安装,使用 import 方式引用)
-  app.js                # 本地server入口
-  routes.js             # 本地路由配置
-  webpack.config.js     # webpack配置文件
-  gulpfile.js           # gulp任务配置
-  config.rb             # compass配置
-  package.json          # 项目配置
-  README.md             # 项目说明
+```javascript
+- webapp/                       # 根目录
+  - src/                        # 开发目录
+    + css/                      # css
+    + img/                      # img
+    + lib/                      # 非模块化第三方依赖库
+    - js/                       # js
+      - component/              # 组件目录
+        - foo/                  # 组件: foo
+          foo.css               # 组件样式
+          util.js               # 组件工具函数
+          foo.tpl               # 组件模板
+          foo.js                # 组件js
+        + bar/                  # 组件: bar
+      ...                       # 根据项目需要任意添加的代码目录
+    + tmpl/                     # 模板目录
+    + helper/                   # handlebars helper 目录
+    a.html                      # 入口文件a
+    b.html                      # 入口文件b
+  - asset/                      # 编译输出目录
+    + css/                      # 编译输出的css目录
+    + font/                     # 编译输出的font目录
+    + img/                      # 编译输出的图片目录
+    + js/                       # 编译输出的js目录
+    a.html                      # 入口文件a
+    b.html                      # 入口文件b
+  + mock/                       # 假数据目录
+  + node_modules/               # CommonJS模块(通过 npm 安装,使用 import 方式引用)
+  app.js                        # 本地server入口
+  routes.js                     # 本地路由配置
+  webpack-common.config.js      # webpack公共配置文件
+  webpack-dev.config.js         # webpack开发配置文件
+  webpack.config.js             # webpack生产配置文件
+  gulpfile.js                   # gulp任务配置
+  package.json                  # 项目配置
+  README.md                     # 项目说明
 ```
 
 ##### 单/多页面支持
@@ -89,13 +89,13 @@ $ npm run start
 
 ### 编译
 
-``` bash
+```bash
 $ npm run build
 ```
 
 ### 模拟生产环境
 
-``` bash
+```bash
 $ npm run asset
 ```
 
@@ -103,13 +103,13 @@ $ npm run asset
 
 纯静态页面型的应用,最简单的做法是直接把 `asset` 文件夹部署到指定机器即可(先配置好机器ip、密码、上传路径等信息):
 
-``` js
+```bash
 $ npm run deploy # or run `gulp deploy`
 ```
 
 如果需要将生成的js、css、图片等发布到 cdn,修改下 `publicPath` 项为目标 cdn 地址即可:
 
-``` js
+```javascript
 ...
 output: {
   ...

@@ -2,63 +2,38 @@
 
 var proxy = require('koa-proxy');
 
-var list = require('./mock/list');
+function router(router, app) {
+  // eg:
+  // router
+  //   .get('/', function *(next) {
+  //     this.body = 'Hello World!';
+  //   })
+  //   .post('/users', function *(next) {
+  //     // ...
+  //   })
+  //   .put('/users/:id', function *(next) {
+  //     // ...
+  //   })
+  //   .del('/users/:id', function *(next) {
+  //     // ...
+  //   });
 
-module.exports = function(router, app) {
-  // mock api
-  // 可以根据需要任意定制接口的返回
-  // router.post('/api/list', function *() {
-  //   var query = this.query || {};
-  //   var offset = query.offset || 0;
-  //   var limit = query.limit || 10;
-  //   var diff = limit - list.length;
-  //   // console.log(query);
-
-  //   if (diff <= 0) {
-  //     this.body = {
-  //       code: 0,
-  //       data: list.slice(0, limit)
-  //     };
-  //   } else {
-  //     var arr = list.slice(0, list.length);
-  //     var i = 0;
-
-  //     while (diff--) arr.push(arr[i++]);
-
-  //     this.body = {
-  //       code: 0,
-  //       data: arr
-  //     };
-  //   }
-  // });
   // method is GET
-  router.get('/api/list', function *() {
-    var query = this.query || {};
-    var offset = query.offset || 0;
-    var limit = query.limit || 10;
-    var diff = limit - list.length;
-    console.log(query); // { offset: '0', limit: '5' }
+  router.get('/api/list', function *(next) {
+    // var req = this.request;
+    // var res = this.response;
+    var list = require('./mock/list');
 
-    if (diff <= 0) {
-      this.body = {
-        code: 0,
-        data: list.slice(0, limit)
-      };
-    } else {
-      var arr = list.slice(0, list.length);
-      var i = 0;
-
-      while (diff--) arr.push(arr[i++]);
-
-      this.body = {
-        code: 0,
-        data: arr
-      };
-    }
+    this.body = {
+      success: true,
+      data: list
+    };
   });
 
   // proxy api
   router.get('/api/foo/bar', proxy({
     url: 'http://foo.bar.com'
   }));
-};
+}
+
+module.exports = router;

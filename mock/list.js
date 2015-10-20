@@ -3,13 +3,13 @@
 var res = [
   {
     id: 1,
-    title: 'foo',
-    content: 'content foo'
+    title: 'smartisan',
+    content: 'content: smartisan'
   },
   {
     id: 2,
-    title: 'title bar',
-    content: 'content bar'
+    title: 'apple',
+    content: 'content: apple'
   }
 ];
 

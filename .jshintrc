@@ -1,40 +1,54 @@
 {
-  "predef": [
-    "module",
-    "require",
-    "exports",
-    "$",
-    "console"
-  ],
-  "maxerr": 50,
-  "globalstrict": true,
-  "sub": true,
-  "supernew": false,
-  "freeze": true,
-  "indent": 2,
-  "white": true,
-  "curly": false,
-  "camelcase": true,
+  // http://jshint.com/docs/options/
+  // Enforcing options:
+  "bitwise": true,
+  "curly": true, // 是否始终使用 {} 包围代码块
+  "eqeqeq": true, // 是否始终使用 === 和 !== 替换 == !=
+  "forin": true, // 使用 for in 遍历对象时检查属性是否通过原型链继承
+  // for (key in obj) {
+  //   if (obj.hasOwnProperty(key)) {
+  //     // We are sure that obj[key] belongs to the object and was not inherited.
+  //     console.log(obj[key]);
+  //   }
+  // }
+  "freeze": true, // 禁止覆盖原生对象属性 Array, Date
+  "funcscope": true, // 变量在块内部声明却在块外部使用,会报 warning 信息
+  "iterator": true, // 迭代器
   "latedef": false,
-  "eqnull": true,
-  "newcap": true,
+  "maxdepth": 5, // 嵌套最大深度
+  "maxerr": 50,
+  "maxparams": 5,
   "noarg": true,
-  "quotmark": "single",
-  "undef": true,
-  "forin": false,
-  "onevar": false,
-  "maxdepth": 5,
-  "asi": true,
-  "boss": true,
-  "eqeqeq": false,
-  "debug": true,
-  "evil": false,
-  "lastsemic": false,
-  "laxcomma": true,
-  "loopfunc": true,
-  "multistr": true,
+  "nocomma": true,
+  "nonbsp": true,
+  "nonew": true,
   "notypeof": true,
+  "shadow": "inner",
+  "singleGroups": true,
+  "strict": true,
+  "undef": true,
+  "unused": true,
+  "varstmt": false, // 是否禁止使用 var 声明变量(推荐设置为 true,但这里考虑使用习惯,暂时设置为 false,但是推荐代理里面使用 let, const 替代 var)
+
+  // Relaxing options:
+  "asi": true, // 分号检查
+  "boss": true,
+  "debug": true,
+  "eqnull": true,
+  "esnext": true, // 是否使用 ES6 语法(这里设置为 true, 推荐代码使用 ES6 语法书写, 并且使用 babel 转换代码)
+  "evil": true, // 限制使用 eval
+  "expr": true,
+  "globalstrict": true,
+  "lastsemic": true,
+  "loopfunc": true, // 抑制循环内部定义函数
+  "noyield": true,
+  "plusplus": false, // 抑制使用 ++ -- 操作符
+  "supernew": false, // 抑制 new function () { ... } and new Object 方式
   "validthis": true,
+  "withstmt": true, // 抑制 with 使用
+
+  // Environments:
   "browser": true,
+  "devel": true, // 忽略 alert, console, etc ('console' is not defined.)
   "jquery": false
 }

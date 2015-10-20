@@ -1,9 +1,0 @@
-{
-  "zepto": "js/lib/zepto",
-
-  "fetch": "js/lib/fetch",
-
-  "commonCss": "css/common.scss",
-
-  "webpackLogo": "img/webpack.png"
-}

@@ -1,8 +1,9 @@
 # NodeJS #
 /node_modules
-/assets
 /.sass-cache
 ./npm-debug.log
+/asset
+/__build
 
 # IDEA #
 ########
