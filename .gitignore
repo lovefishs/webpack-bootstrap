@@ -2,8 +2,7 @@
 /node_modules
 /.sass-cache
 ./npm-debug.log
-/asset
-/__build
+/dist
 
 # IDEA #
 ########
@@ -71,4 +70,8 @@ target/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
+<<<<<<< HEAD
 Thumbs.db
+=======
+Thumbs.db
+>>>>>>> origin/master

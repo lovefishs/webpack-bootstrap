@@ -1,5 +1,5 @@
 'use strict';
 
-var genConf = require('./webpack-common.config');
+let genConf = require('./webpack-common.config');
 
 module.exports = genConf();

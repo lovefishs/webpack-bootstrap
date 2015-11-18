@@ -24,7 +24,7 @@
   "nonew": true,
   "notypeof": true,
   "shadow": "inner",
-  "singleGroups": true,
+  "singleGroups": false,
   "strict": true,
   "undef": true,
   "unused": true,
@@ -50,5 +50,19 @@
   // Environments:
   "browser": true,
   "devel": true, // 忽略 alert, console, etc ('console' is not defined.)
-  "jquery": false
+  "jquery": false,
+
+  // 预定义
+  "predef" : ["$super", "define", "require", "module", "exports", "console"],
+
+  // Globals
+  "globals": {
+    /* MOCHA */
+    "describe"   : false,
+    "it"         : false,
+    "before"     : false,
+    "beforeEach" : false,
+    "after"      : false,
+    "afterEach"  : false
+  }
 }

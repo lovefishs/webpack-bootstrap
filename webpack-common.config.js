@@ -1,89 +1,87 @@
 'use strict';
 
-// @see http://christianalfoni.github.io/javascript/2014/12/13/did-you-know-webpack-and-react-is-awesome.html
-// @see https://github.com/webpack/react-starter/blob/master/make-webpack-config.js
-
 // load native modules
-var path = require('path');
-var fs = require('fs');
+let path = require('path');
+let fs = require('fs');
 
-var webpack = require('webpack');
-var _ = require('lodash');
+// load local modules
+let webpack = require('webpack');
+let ExtractTextPlugin = require('extract-text-webpack-plugin');
+let HtmlWebpackPlugin = require('html-webpack-plugin');
 
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+let alias = require('./app/alias.json');
 
-var UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
-var CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
+let UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
+let CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 
-var srcDir = path.resolve(process.cwd(), 'src');
-var asset = 'asset/';
-var aliasMap = require('./src/aliasmap.json');
-
-var excludeFromStats = [
-  /node_modules[\\\/]/
-];
+let appDir = path.resolve(process.cwd(), 'app');
+let distDir = path.resolve(process.cwd(), 'dist');
+let nodeModuleDir = path.resolve(process.cwd(), 'node_modules');
 
 // 获取入口文件信息
-// 通过这个函数获取 src/*.html 同名的 src/js/*.js 文件作为入口文件
+// 通过这个函数获取 app/*.html 同名的 app/js/*.js 文件作为入口文件
 function genEntries() {
-  var jsDir = path.resolve(srcDir, 'js');
-  var names = fs.readdirSync(jsDir);
-  var map = {};
+  let jsDir = path.resolve(appDir, 'js');
+  let names = fs.readdirSync(jsDir);
+  let map = {};
 
-  names.forEach(function(name) {
-    var m = name.match(/(.+)\.(js)$/);
-    var entry = m ? m[1] : '';
-    var entryPath = entry ? path.resolve(jsDir, name) : '';
+  for (let name of names) {
+    // "index.js".match(/(.+)\.(js)$/) => ["index.js", "index", "js"]
+    // "xxx".match(/(.+)\.(js)$/) => null
+    let m = name.match(/(.+)\.(js)$/);
+    let entry = m ? m[1] : '';
+    let entryPath = entry ? path.resolve(jsDir, name) : '';
 
     if (entry) {
       map[entry] = entryPath;
     }
-  });
+  }
 
   return map;
 }
 
-// webpack 的三个概念: 模块(module), 入口文件(entry), 分块(chunk)
-// module 指各种资源文件,如 js,css,img,svg,scss,less等等,一切资源皆被当做模块
-// webpack 编译输出的文件包括以下 2 种:
-// entry: 入口可以是一个或者多个资源合并而成,由 html 通过 script 标签引入
-// chunk: 被 entry 所依赖的额外的代码块,同样可以包含一个或者多个文件
 function commonConf(options) {
   options = options || {};
 
-  var debug = options.debug !== undefined ? options.debug : true;
-  var entries = genEntries();
-  var chunks = Object.keys(entries);
-  var config = {
+  let debug = options.debug !== undefined ? options.debug : true;
+  let entries = genEntries();
+  let chunks = Object.keys(entries);
+
+  let config = {
     cache: true,
 
     // entry 项是入口文件路径映射表
+    // eg: { 'index': '/.../app/js/index.js' }
     entry: entries,
 
     // output 项是对输出文件路径和名称的配置,占位符如[id]、[chunkhash]、[name]等分别代表编译后的模块 id、chunk 的 hashnum 值、chunk 名等,可以任意组合决定最终输出的资源格式
     // hashnum 的做法,基本上弱化了版本号的概念,版本迭代的时候 chunk 是否更新只取决于 chnuk 的内容是否发生变化
     output: {
-      // 在 debug 模式下,__build 目录是虚拟的,webpack 的 dev server 存储在内存里
-      path: path.resolve(debug ? '__build' : asset),
-      filename: debug ? '[name].js' : 'js/[name].[chunkhash:8].min.js',
-      chunkFilename: debug ? 'chunk.[chunkhash:8].js' : 'js/chunk.[chunkhash:8].min.js',
-      hotUpdateChunkFilename: debug ? '[id].[chunkhash:8].js' : 'js/[id].[chunkhash:8].min.js',
-      publicPath: debug ? '/__build/' : ''
+      path: debug ? distDir : distDir,
+      filename: debug ? 'js/[name].js' : 'js/[name].[chunkhash:8].js',
+      chunkFilename: debug ? 'js/chunk.js' : 'js/chunk.[chunkhash:8].js',
+      hotUpdateChunkFilename: debug ? 'js/[id].js' : 'js/[id].[chunkhash:8].js',
+      publicPath: debug ? '' : '',
+      // 开发环境: <script src="js/bundle.js"></script>
+      // 生产环境: <script src="http://cdn.site.com/js/bundle.460de4b8.min.js"></script>
+      // 这里资源根路径的配置在 output 项的 publicPath(eg: 'http://cdn.site.com/')
     },
 
+    // resolve 用来配置应用层的模块（要被打包的模块）解析
     resolve: {
-      root: [srcDir, './node_modules'],
-      alias: aliasMap,
-      extensions: ['', '.js', '.css', '.scss', '.tpl', '.png', '.jpg']
+      root: [appDir, nodeModuleDir],
+      alias: alias,
+      extensions: ['', '.js', '.css', '.scss', '.tpl', '.png', '.jpg'],
     },
 
+    // resolveLoader 用来配置 loader 模块的解析
     resolveLoader: {
-      root: path.join(__dirname, 'node_modules')
+      root: [nodeModuleDir],
     },
 
     module: {
       noParse: [],
+
       loaders: [
         {
           // test 项表示匹配的资源类型
@@ -97,32 +95,50 @@ function commonConf(options) {
             // url-loader 更好用,小于 10KB 的图片会自动转成 dataUrl,
             // 否则则调用 file-loader,参数直接传入
             'url?limit=10000&name=img/[name].[hash:8].[ext]',
-          ]
+          ],
         },
         {
           test: /\.(woff|eot|ttf)$/i,
-          loader: 'url?limit=10000&name=font/[name].[hash:8].[ext]'
+          loader: 'url?limit=10000&name=font/[name].[hash:8].[ext]',
         },
         {
           test: /\.(ejs)$/,
-          loader: 'ejs'
+          loader: 'ejs',
         },
         {
           test: /\.(hbs|handlebars)$/,
-          // loader: 'handlebars?helperDirs[]='+ srcDir +'/helper'
+          // loader: 'handlebars?helperDirs[]='+ appDir +'/helper'
           loader: 'handlebars',
           query: {
             helperDirs: [
-              srcDir +'/helper'
+              `${appDir}/helper`,
             ]
-          }
+          },
+        },
+        {
+          test: /\.(css)$/,
+          loader: ExtractTextPlugin.extract('style', 'css?minimize'),
+        },
+        {
+          test: /\.(scss)$/,
+          loader: ExtractTextPlugin.extract('style', 'css?minimize!autoprefixer?browsers=last 2 version!sass'),
+          // loader: ExtractTextPlugin.extract('style', 'css?minimize&sourceMap!autoprefixer?browsers=last 2 version!sass?sourceMap'),
+        },
+        {
+          test: /\.(less)$/,
+          loader: ExtractTextPlugin.extract('style', 'css?minimize!autoprefixer?browsers=last 2 version!less'),
         },
         {
           test: /\.(js)$/,
           exclude: /(node_modules|lib)/,
-          loader: 'babel'
-        }
-      ]
+          loader: 'babel',
+          query: {
+            presets: ['react', 'es2015'],
+          },
+          // npm install --save-dev babel-preset-react babel-preset-es2015
+          // loader: 'babel?presets[]=react,presets[]=es2015',
+        },
+      ],
     },
 
     plugins: [
@@ -131,108 +147,71 @@ function commonConf(options) {
         name: 'bundle', // 将公共模块提取,生成名为 bundle 的 chunk
         chunks: chunks,
         // Modules must be shared between all entries
-        minChunks: chunks.length // 提取所有 chunks 共同依赖的模块
-      })
+        minChunks: chunks.length, // 提取所有 chunks 共同依赖的模块
+      }),
+      // css chunk
+      new ExtractTextPlugin((debug ? 'css/[name].css' : 'css/[name].[contenthash:8].css'), {
+        // 当 allChunks 指定为 false 时,css loader 必须指定怎么处理
+        // additional chunk 所依赖的 css,即指定 `ExtractTextPlugin.extract()`
+        // 第一个参数 `notExtractLoader`,一般是使用 style-loader
+        // @see https://github.com/webpack/extract-text-webpack-plugin
+        allChunks: false,
+      }),
     ],
 
     devServer: {
       stats: {
         cached: false,
-        exclude: excludeFromStats,
-        colors: true
-      }
-    }
+        exclude: [
+          /node_modules[\\\/]/
+        ],
+        colors: true,
+      },
+    },
   };
 
-  if (debug) {
-    // 开发阶段,css 直接内嵌
-    var cssLoader = {
-      test: /\.(css)$/,
-      loader: 'style!css'
-    };
-    var sassLoader = {
-      test: /\.(scss)$/,
-      loader: 'style!css!autoprefixer?browsers=last 2 version!sass'
-    };
-    var lessLoader = {
-      test: /\.(less)$/,
-      loader: 'style!autoprefixer?browsers=last 2 version!less'
-    };
+  // 自动生成入口文件,入口 js 名必须和入口文件名相同
+  // 例如: a 页的入口文件是 a.html,那么在 js 目录下必须有一个 a.js 作为入口文件
+  let pages = fs.readdirSync(appDir);
 
-    config.module.loaders.push(cssLoader);
-    config.module.loaders.push(sassLoader);
-    config.module.loaders.push(lessLoader);
-  } else {
+  for (let pageName of pages) {
+    let m = pageName.match(/(.+)\.(html)$/);
+
+    if (m) {
+      let conf = {
+        template: path.resolve(appDir, pageName),
+        filename: pageName,
+      };
+      if (!debug) {
+        // @see https://github.com/kangax/html-minifier
+        conf.minify = {
+          collapseWhitespace: true,
+          removeComments: true,
+        };
+      }
+
+      if (config.entry[m[1]]) {
+        conf.inject = 'body';
+        conf.chunks = ['bundle', m[1]];
+      }
+
+      // HtmlWebpackPlugin 插件解决资源路径切换问题
+      config.plugins.push(new HtmlWebpackPlugin(conf));
+    }
+  }
+
+  if (!debug) {
     // 生成 source map file
     // config.devtool = 'source-map'; // or 'inline-source-map'
 
-    // 编译阶段,css 分离出来单独引入
-    var cssLoader = {
-      test: /\.(css)$/,
-      loader: ExtractTextPlugin.extract('style', 'css?minimize')
-      // loader: ExtractTextPlugin.extract('style', 'css?minimize&sourceMap') // enable minimize and sourceMap
-    };
-    var sassLoader = {
-      test: /\.(scss)$/,
-      loader: ExtractTextPlugin.extract('style', 'css?minimize!autoprefixer?browsers=last 2 version!sass')
-      // loader: ExtractTextPlugin.extract('style', 'css?minimize&sourceMap!autoprefixer?browsers=last 2 version!sass?sourceMap')
-    };
-    var lessLoader = {
-      test: /\.(less)$/,
-      loader: ExtractTextPlugin.extract('style', 'css?minimize!autoprefixer?browsers=last 2 version!less')
-    };
-
-    config.module.loaders.push(cssLoader);
-    config.module.loaders.push(sassLoader);
-    config.module.loaders.push(lessLoader);
-    config.plugins.push(
-      new ExtractTextPlugin('css/[name].[contenthash:8].min.css', {
-        // 当 allChunks 指定为 false 时,css loader 必须指定怎么处理
-        // additional chunk 所依赖的 css,即指定 `ExtractTextPlugin.extract()`
-        // 第一个参数 `notExtractLoader`,一般是使用 style-loader
-        // @see https://github.com/webpack/extract-text-webpack-plugin
-        allChunks: false
-      })
-    );
-
-    // 自动生成入口文件,入口 js 名必须和入口文件名相同
-    // 例如: a 页的入口文件是 a.html,那么在 js 目录下必须有一个 a.js 作为入口文件
-    var pages = fs.readdirSync(srcDir);
-
-    pages.forEach(function(filename) {
-      var m = filename.match(/(.+)\.(html)$/);
-
-      if (m) {
-        var conf = {
-          template: path.resolve(srcDir, filename),
-          // @see https://github.com/kangax/html-minifier
-          minify: {
-            collapseWhitespace: true,
-            removeComments: true
-          },
-          filename: filename
-        };
-
-        if (m[1] in config.entry) {
-          conf.inject = 'body';
-          conf.chunks = ['bundle', m[1]];
-        }
-
-        // HtmlWebpackPlugin 插件解决资源路径切换问题
-        // 开发环境: <script src="/__build/bundle.js"></script>
-        // 生产环境: <script src="http://cdn.site.com/js/bundle.460de4b8.min.js"></script>
-        // 这里资源根路径的配置在 output 项的 publicPath
-        config.plugins.push(new HtmlWebpackPlugin(conf));
-      }
-    });
-
+    // UglifyJs
     config.plugins.push(new UglifyJsPlugin({
       compress: {
-        warnings: false
+        warnings: false,
       },
       mangle: {
-        except: ['$super', 'module', 'require', 'exports', 'console', '$']
-      }
+        except: ['$super', 'define', 'module', 'require', 'exports', 'console', '$', '_'],
+      },
     }));
   }
 

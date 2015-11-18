@@ -1,87 +1,91 @@
 'use strict';
 
-var gulp = require('gulp');
-var webpack = require('webpack');
-var gutil = require('gulp-util');
-var jshint = require('gulp-jshint');
-var jshintJSX = require('jshint-jsx');
-var stylish = require('jshint-stylish');
-var rimraf = require('gulp-rimraf');
-var replace = require('gulp-replace');
-var sftp = require('gulp-sftp');
-var WebpackDevServer = require('webpack-dev-server');
+let gulp = require('gulp');
+let webpack = require('webpack');
+let gutil = require('gulp-util');
+let jshint = require('gulp-jshint');
+let jshintJSX = require('jshint-jsx');
+let stylish = require('jshint-stylish');
+let rimraf = require('gulp-rimraf');
+let replace = require('gulp-replace');
+let sftp = require('gulp-sftp');
+let watch = require('gulp-watch');
+let WebpackDevServer = require('webpack-dev-server');
 
-var webpackConf = require('./webpack.config');
-var webpackDevConf = require('./webpack-dev.config');
+let webpackConf = require('./webpack.config');
+let webpackDevConf = require('./webpack-dev.config');
 
-var src = process.cwd() + '/src';
-var asset = process.cwd() + '/asset';
+let appDir = `${process.cwd()}/app`;
+let distDir = `${process.cwd()}/dist`;
 
-// js check
-gulp.task('hint', function() {
-  return gulp.src([
-      '!' + src + '/lib/**/*.js',
-      src + '/js/**/*.js'
-    ])
+let hintArr = [
+  `${appDir}/{js/**/*.js,helper/**/*.js}`,
+  `!${appDir}/lib/**/*.js`,
+];
+let copyArr = [
+  `${appDir}/**/*`,
+  `!${appDir}/{*.html,js,js/**,css,css/**,helper,helper/**,alias.json}`,
+];
+
+// js hint
+gulp.task('hint', () => {
+  return gulp
+    .src(hintArr)
     .pipe(jshint({
-      linter: jshintJSX.JSXHINT
+      linter: jshintJSX.JSXHINT,
     }))
     .pipe(jshint.reporter(stylish));
 });
 
-// clean asset
-gulp.task('clean', function() {  
+// clean
+gulp.task('clean', () => {
   return gulp
-    .src(asset, { read: false }) // much faster
+    .src(distDir, { read: false }) // much faster
     .pipe(rimraf());
 });
 
+// copy
+gulp.task('copy', ['clean'], () => {
+  return gulp
+    .src(copyArr)
+    .pipe(gulp.dest(distDir));
+});
+
+// watch copy
+gulp.task('watch', () => {  
+  return gulp
+    .src(copyArr, { base: appDir })
+    .pipe(watch(appDir, { base: appDir }))
+    .pipe(gulp.dest(distDir));
+});
+
 // run webpack pack
-gulp.task('pack', ['clean'], function(done) {
-  webpack(webpackConf, function(err, stats) {
+gulp.task('pack', ['copy'], (done) => {
+  webpack(webpackConf, (err, stats) => {
     if (err) {
       throw new gutil.PluginError('webpack', err);
     }
 
     gutil.log('[webpack]', stats.toString({
-      colors: true
+      colors: true,
     }));
+
     done();
   });
 });
 
-// html process
-gulp.task('default', ['pack'], function() {
-  return gulp
-    .src(asset + '/*.html')
-    // remove <script data-debug ...></script>
-    .pipe(replace(/<script(.+)?data-debug([^>]+)?><\/script>/g, ''))
-    .pipe(gulp.dest(asset));
-});
-
-// deploy asset to remote server
-gulp.task('deploy', function() {
-  return gulp.src(asset + '/**')
-    .pipe(sftp({
-      host: '[remote server ip]',
-      remotePath: '/www/app/',
-      user: 'foo',
-      pass: 'bar'
-    }));
-});
-
 // run HMR on `cli` mode
 // @see http://webpack.github.io/docs/webpack-dev-server.html
-gulp.task('hmr', function(done) {
-  var compiler = webpack(webpackDevConf);
-  var devSvr = new WebpackDevServer(compiler, {
+gulp.task('hmr', ['copy'], (done) => {
+  let compiler = webpack(webpackDevConf);
+  let devSvr = new WebpackDevServer(compiler, {
     contentBase: webpackConf.output.path,
     publicPath: webpackDevConf.output.publicPath,
     hot: true,
     stats: webpackDevConf.devServer.stats,
   });
 
-  devSvr.listen(8080, '0.0.0.0', function(err) {
+  devSvr.listen(8088, '0.0.0.0', (err) => {
     if (err) {
       throw new gutil.PluginError('webpack-dev-server', err);
     }
@@ -92,3 +96,27 @@ gulp.task('hmr', function(done) {
     // done();
   });
 });
+
+// deploy dist to remote server
+gulp.task('deploy', () => {
+  return gulp
+    .src(`${distDir}/**`)
+    .pipe(sftp({
+      host: '192.168.1.111',
+      remotePath: '/www/app/',
+      user: 'admin',
+      pass: 'password',
+    }));
+});
+
+let replaceHtml = () => {
+  return gulp
+    .src(`${distDir}/*.html`)
+    // remove <link data-debug> & <script data-debug ...></script>
+    .pipe(replace(/<link[^<]+data-debug.*?>|<script[^<]+data-debug([^>]+)?><\/script>/gi, ''))
+    .pipe(gulp.dest(distDir));
+}
+
+gulp.task('default', ['hint', 'pack']);
+gulp.task('build', ['hint', 'pack']);
+gulp.task('dev', ['hmr']);
